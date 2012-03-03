@@ -1,47 +1,96 @@
 <?php
+App::uses('AppController', 'Controller');
+/**
+ * Species Controller
+ *
+ * @property Species $Species
+ */
 class SpeciesController extends AppController {
-	public $name = 'Species';
-	public $helpers = array('Html', 'Form');
-	public $components = array('Session');
 
-	/**
-	 *
-	 * GET /species/?
-	 */
+
+/**
+ * index method
+ *
+ * @return void
+ */
 	public function index() {
-		$this->set('title_for_layout', 'Species Index');
-
-		$this->set('species', $this->Species->find('all'));
+		$this->Species->recursive = 0;
+		$this->set('species', $this->paginate());
 	}
 
-	/**
-	 *
-	 * GET /species/:id/?
-	 */
-	public function view($id) {
-		$this->set('title_for_layout', 'Species View');
-
+/**
+ * view method
+ *
+ * @param string $id
+ * @return void
+ */
+	public function view($id = null) {
 		$this->Species->id = $id;
-		$this->set('species', $this->Species->read());
+		if (!$this->Species->exists()) {
+			throw new NotFoundException(__('Invalid species'));
+		}
+		$this->set('species', $this->Species->read(null, $id));
 	}
 
-	/**
-	 *
-	 * GET/POST /species/add/?
-	 */
+/**
+ * add method
+ *
+ * @return void
+ */
 	public function add() {
-		$this->set('title_for_layout', 'Add Species');
-
-		// If the user did a HTTP_POST, process their input
 		if ($this->request->is('post')) {
+			$this->Species->create();
 			if ($this->Species->save($this->request->data)) {
-				$this->Session->setFlash('Your Species has been saved.');
+				$this->Session->setFlash(__('The species has been saved'));
 				$this->redirect(array('action' => 'index'));
 			} else {
-				$this->Session->setFlash('Unable to add your Species.');
+				$this->Session->setFlash(__('The species could not be saved. Please, try again.'));
 			}
 		}
-		// else fall through to add view renderer
 	}
-	
+
+/**
+ * edit method
+ *
+ * @param string $id
+ * @return void
+ */
+	public function edit($id = null) {
+		$this->Species->id = $id;
+		if (!$this->Species->exists()) {
+			throw new NotFoundException(__('Invalid species'));
+		}
+		if ($this->request->is('post') || $this->request->is('put')) {
+			if ($this->Species->save($this->request->data)) {
+				$this->Session->setFlash(__('The species has been saved'));
+				$this->redirect(array('action' => 'index'));
+			} else {
+				$this->Session->setFlash(__('The species could not be saved. Please, try again.'));
+			}
+		} else {
+			$this->request->data = $this->Species->read(null, $id);
+		}
+	}
+
+/**
+ * delete method
+ *
+ * @param string $id
+ * @return void
+ */
+	public function delete($id = null) {
+		if (!$this->request->is('post')) {
+			throw new MethodNotAllowedException();
+		}
+		$this->Species->id = $id;
+		if (!$this->Species->exists()) {
+			throw new NotFoundException(__('Invalid species'));
+		}
+		if ($this->Species->delete()) {
+			$this->Session->setFlash(__('Species deleted'));
+			$this->redirect(array('action' => 'index'));
+		}
+		$this->Session->setFlash(__('Species was not deleted'));
+		$this->redirect(array('action' => 'index'));
+	}
 }
