@@ -686,6 +686,9 @@ class CakeEmail {
 			if ($email === $alias) {
 				$return[] = $email;
 			} else {
+				if (strpos($alias, ',') !== false) {
+					$alias = '"' . $alias . '"';
+				}
 				$return[] = sprintf('%s <%s>', $this->_encode($alias), $email);
 			}
 		}
@@ -825,7 +828,7 @@ class CakeEmail {
 			$this->_messageId = $message;
 		} else {
 			if (!preg_match('/^\<.+@.+\>$/', $message)) {
-				throw new SocketException(__d('cake_dev', 'Invalid format to Message-ID. The text should be something like "<uuid@server.com>"'));
+				throw new SocketException(__d('cake_dev', 'Invalid format for Message-ID. The text should be something like "<uuid@server.com>"'));
 			}
 			$this->_messageId = $message;
 		}
@@ -944,7 +947,8 @@ class CakeEmail {
 
 /**
  * Send an email using the specified content, template and layout
- *
+ * 
+ * @param mixed $content String with message or array with messages
  * @return array
  * @throws SocketException
  */
@@ -953,7 +957,7 @@ class CakeEmail {
 			throw new SocketException(__d('cake_dev', 'From is not specified.'));
 		}
 		if (empty($this->_to) && empty($this->_cc) && empty($this->_bcc)) {
-			throw new SocketException(__d('cake_dev', 'You need specify one destination on to, cc or bcc.'));
+			throw new SocketException(__d('cake_dev', 'You need to specify at least one destination for to, cc or bcc.'));
 		}
 
 		if (is_array($content)) {
@@ -1240,9 +1244,14 @@ class CakeEmail {
 /**
  * Attach non-embedded files by adding file contents inside boundaries.
  *
+ * @param string $boundary Boundary to use. If null, will default to $this->_boundary 
  * @return array An array of lines to add to the message
  */
-	protected function _attachFiles() {
+	protected function _attachFiles($boundary = null) {
+		if ($boundary === null) {
+			$boundary = $this->_boundary;
+		}
+
 		$msg = array();
 		foreach ($this->_attachments as $filename => $fileInfo) {
 			if (!empty($fileInfo['contentId'])) {
@@ -1250,7 +1259,7 @@ class CakeEmail {
 			}
 			$data = $this->_readFile($fileInfo['file']);
 
-			$msg[] = '--' . $this->_boundary;
+			$msg[] = '--' . $boundary;
 			$msg[] = 'Content-Type: ' . $fileInfo['mimetype'];
 			$msg[] = 'Content-Transfer-Encoding: base64';
 			$msg[] = 'Content-Disposition: attachment; filename="' . $filename . '"';
@@ -1278,9 +1287,14 @@ class CakeEmail {
 /**
  * Attach inline/embedded files to the message.
  *
+ * @param string $boundary Boundary to use. If null, will default to $this->_boundary 
  * @return array An array of lines to add to the message
  */
-	protected function _attachInlineFiles() {
+	protected function _attachInlineFiles($boundary = null) {
+		if ($boundary === null) {
+			$boundary = $this->_boundary;
+		}
+
 		$msg = array();
 		foreach ($this->_attachments as $filename => $fileInfo) {
 			if (empty($fileInfo['contentId'])) {
@@ -1288,7 +1302,7 @@ class CakeEmail {
 			}
 			$data = $this->_readFile($fileInfo['file']);
 
-			$msg[] = '--' . $this->_boundary;
+			$msg[] = '--' . $boundary;
 			$msg[] = 'Content-Type: ' . $fileInfo['mimetype'];
 			$msg[] = 'Content-Transfer-Encoding: base64';
 			$msg[] = 'Content-ID: <' . $fileInfo['contentId'] . '>';
@@ -1323,7 +1337,7 @@ class CakeEmail {
 			$msg[] = '--' . $boundary;
 			$msg[] = 'Content-Type: multipart/related; boundary="rel-' . $boundary . '"';
 			$msg[] = '';
-			$relBoundary = 'rel-' . $boundary;
+			$relBoundary = $textBoundary = 'rel-' . $boundary;
 		}
 
 		if ($hasMultipleTypes) {
@@ -1365,7 +1379,7 @@ class CakeEmail {
 		}
 
 		if ($hasInlineAttachments) {
-			$attachments = $this->_attachInlineFiles();
+			$attachments = $this->_attachInlineFiles($relBoundary);
 			$msg = array_merge($msg, $attachments);
 			$msg[] = '';
 			$msg[] = '--' . $relBoundary . '--';
@@ -1373,7 +1387,7 @@ class CakeEmail {
 		}
 
 		if ($hasAttachments) {
-			$attachments = $this->_attachFiles();
+			$attachments = $this->_attachFiles($boundary);
 			$msg = array_merge($msg, $attachments);
 		}
 		if ($hasAttachments || $hasMultipleTypes) {

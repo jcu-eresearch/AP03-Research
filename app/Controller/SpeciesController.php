@@ -14,6 +14,8 @@ class SpeciesController extends AppController {
  * @return void
  */
 	public function index() {
+		$this->set('title_for_layout', 'Species - Index');
+
 		$this->Species->recursive = 0;
 		$this->set('species', $this->paginate());
 
@@ -28,6 +30,8 @@ class SpeciesController extends AppController {
  * @return void
  */
 	public function view($id = null) {
+		$this->set('title_for_layout', 'Species - View');
+
 		$this->Species->id = $id;
 		if (!$this->Species->exists()) {
 			throw new NotFoundException(__('Invalid species'));
