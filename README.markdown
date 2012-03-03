@@ -18,3 +18,29 @@ GET /species/<species_id>/occurrences/<occurence_id>             (lists the deta
 ```
 
 *N.B.* These may change based on PHP Cake conventions
+
+DB Setup
+==========
+
+mysql
+------
+
+```sql
+
+CREATE TABLE species (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    created DATETIME DEFAULT NULL,
+    modified DATETIME DEFAULT NULL
+);
+
+CREATE TABLE occurrences (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    species_id INT UNSIGNED,
+    latitude NUMERIC NOT NULL,
+    longitude NUMERIC NOT NULL,
+    created DATETIME DEFAULT NULL,
+    modified DATETIME DEFAULT NULL
+);
+
+```
