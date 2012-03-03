@@ -17,7 +17,7 @@
 					<?php echo $this->Html->link($s['Species']['name'],
 					array('controller' => 'species', 'action' => 'view', $s['Species']['id'])); ?>
 			</td>
-			<td><?php echo $post['Species']['created']; ?></td>
+			<td><?php echo $s['Species']['created']; ?></td>
 	</tr>
 	<?php endforeach; ?>
 </table>

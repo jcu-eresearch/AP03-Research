@@ -10,6 +10,7 @@
 		-->
 		<?php
 			echo $this->Html->css('cake.generic');
+			echo $this->Html->css('screen');
 			echo $scripts_for_layout;
 		?>
 	</head>
