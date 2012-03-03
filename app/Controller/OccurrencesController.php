@@ -47,9 +47,9 @@ class OccurrencesController extends AppController {
 				$this->Session->setFlash(__('The occurrence could not be saved. Please, try again.'));
 			}
 		}
-		$species_id = $this->request->query['species_id'];
 
-		if ($species_id) {
+		if (array_key_exists('species_id', $this->request->query)) {
+			$species_id = $this->request->query['species_id'];
 			$species = $this->Occurrence->Species->find('list', array('conditions' => array('id' => $species_id)));
 
 			// If we coudln't find any species with that id.
