@@ -5,6 +5,7 @@
 
 class Occurrence extends AppModel {
 	public $name = 'Occurrence';
+	public $belongsTo = 'Species';
 
 	// Specify validation for Occurrence
 	// See API: http://book.cakephp.org/2.0/en/models/data-validation.html

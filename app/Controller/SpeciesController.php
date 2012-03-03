@@ -9,8 +9,20 @@ class SpeciesController extends AppController {
 	 * GET /species/?
 	 */
 	public function index() {
-		$this->set('title_for_layout', 'View Species');
+		$this->set('title_for_layout', 'Species Index');
+
 		$this->set('species', $this->Species->find('all'));
+	}
+
+	/**
+	 *
+	 * GET /species/:id/?
+	 */
+	public function view($id) {
+		$this->set('title_for_layout', 'Species View');
+
+		$this->Species->id = $id;
+		$this->set('species', $this->Species->read());
 	}
 
 	/**
@@ -19,7 +31,8 @@ class SpeciesController extends AppController {
 	 */
 	public function add() {
 		$this->set('title_for_layout', 'Add Species');
-		// If the user did a POST, process their input
+
+		// If the user did a HTTP_POST, process their input
 		if ($this->request->is('post')) {
 			if ($this->Species->save($this->request->data)) {
 				$this->Session->setFlash('Your Species has been saved.');
