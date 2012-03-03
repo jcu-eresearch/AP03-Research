@@ -37,8 +37,8 @@ CREATE TABLE species (
 CREATE TABLE occurrences (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     species_id INT UNSIGNED,
-    latitude NUMERIC NOT NULL,
-    longitude NUMERIC NOT NULL,
+    latitude DECIMAL(12,9) NOT NULL,
+    longitude DECIMAL(12,9) NOT NULL,
     created DATETIME DEFAULT NULL,
     modified DATETIME DEFAULT NULL
 );
