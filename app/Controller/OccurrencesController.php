@@ -47,7 +47,18 @@ class OccurrencesController extends AppController {
 				$this->Session->setFlash(__('The occurrence could not be saved. Please, try again.'));
 			}
 		}
-		$species = $this->Occurrence->Species->find('list');
+		$species_id = $this->request->query['species_id'];
+
+		if ($species_id) {
+			$species = $this->Occurrence->Species->find('list', array('conditions' => array('id' => $species_id)));
+
+			// If we coudln't find any species with that id.
+			if (empty($species)) {
+				throw new NotFoundException(__('Invalid species_id'));
+			}
+		} else {
+			$species = $this->Occurrence->Species->find('list');
+		}
 		$this->set(compact('species'));
 	}
 

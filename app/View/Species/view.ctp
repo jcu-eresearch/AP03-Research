@@ -69,7 +69,7 @@
 
 	<div class="actions">
 		<ul>
-			<li><?php echo $this->Html->link(__('New Occurrence'), array('controller' => 'occurrences', 'action' => 'add'));?> </li>
+			<li><?php echo $this->Html->link(__('New Occurrence'), array('controller' => 'occurrences', 'action' => 'add', '?' => array('species_id' => $species['Species']['id'])));?> </li>
 		</ul>
 	</div>
 </div>
