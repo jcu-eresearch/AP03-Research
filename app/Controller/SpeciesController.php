@@ -6,6 +6,7 @@ App::uses('AppController', 'Controller');
  * @property Species $Species
  */
 class SpeciesController extends AppController {
+	public $components = array('RequestHandler');
 
 
 /**
@@ -16,6 +17,7 @@ class SpeciesController extends AppController {
 	public function index() {
 		$this->Species->recursive = 0;
 		$this->set('species', $this->paginate());
+		$this->set('_serialize', 'species');
 	}
 
 /**

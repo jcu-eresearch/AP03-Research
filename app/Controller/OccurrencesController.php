@@ -6,6 +6,7 @@ App::uses('AppController', 'Controller');
  * @property Occurrence $Occurrence
  */
 class OccurrencesController extends AppController {
+	public $components = array('RequestHandler');
 
 
 /**

@@ -38,6 +38,11 @@
 	CakePlugin::routes();
 
 /**
+ * Tell cake php to parse json and xml extensions
+ */
+ Router::parseExtensions('json', 'xml');
+
+/**
  * Load the CakePHP default routes. Remove this if you do not want to use
  * the built-in default routes.
  */
