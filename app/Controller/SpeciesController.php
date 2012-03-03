@@ -8,7 +8,6 @@ App::uses('AppController', 'Controller');
 class SpeciesController extends AppController {
 	public $components = array('RequestHandler');
 
-
 /**
  * index method
  *
@@ -17,6 +16,8 @@ class SpeciesController extends AppController {
 	public function index() {
 		$this->Species->recursive = 0;
 		$this->set('species', $this->paginate());
+
+		// Specify the output for the xml/json views.
 		$this->set('_serialize', 'species');
 	}
 
