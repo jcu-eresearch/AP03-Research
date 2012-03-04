@@ -128,4 +128,46 @@ class SpeciesController extends AppController {
 		$this->Session->setFlash(__('Species was not deleted'));
 		$this->redirect(array('action' => 'index'));
 	}
+
+/**
+ * single_upload_json method
+ *
+ * @return void
+ */
+	public function single_upload_json() {
+		$this->set('title_for_layout', 'Species - Single Species Upload (JSON)');
+
+		// If user did a HTTP_POST, process the upload file
+		if ($this->request->is('post')) {
+			// File: data['Species']['upload_file'] => (array)
+			$file = $this->request->data['Species']['upload_file'];
+
+			// File's array:
+			//   name => (name of file)
+			//   type => (file type, e.g. image/jpeg)
+			//   tmp_name => (file_path)
+			//   error => 0
+			//   size => (file_size in Bytes)
+			$file_name = $file['name'];
+			$file_type = $file['type'];
+			$tmp_file_path= $file['tmp_name'];
+
+			// Expected file type is application/json
+			if ($file_type != 'application/json') {
+				$this->Session->setFlash(__('The species file must be of type application/json. Upload file could not be processed. Please, try again.'));
+			} else {
+				$file_contents = file_get_contents($tmp_file_path);
+				$json_decoded_file_contents = json_decode($file_contents, true);
+
+				if ($this->Species->saveAssociated($json_decoded_file_contents)) {
+					$this->Session->setFlash(__('The species has been saved'));
+					$this->redirect(array('action' => 'index'));
+				} else {
+					$this->Session->setFlash(__('The species could not be saved. Please, try again.'));
+				}
+			}
+		}
+		// Else -> Fall through to render view (form to upload a single species json file)
+	}
+
 }
