@@ -24,6 +24,13 @@ GET /occurrences/<occurence_id>                                  (lists the deta
 Setup
 ==========
 
+php.ini
+---------
+
+To allow for large species file uploads, it may be necessary to increase <code>max_execution_time</code>.
+In my case, it took approximately 1 minute to upload and process a species with 130k occurrences.
+I have set <code>max_execution_time</code> to 300, to be on the safe side.
+
 DB
 ---------
 
