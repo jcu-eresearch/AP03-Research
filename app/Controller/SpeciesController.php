@@ -170,4 +170,23 @@ class SpeciesController extends AppController {
 		// Else -> Fall through to render view (form to upload a single species json file)
 	}
 
+/**
+ * map method
+ *
+ * @param string $id
+ * @return void
+ */
+	public function map($id = null) {
+		$this->set('title_for_layout', 'Species - Map');
+		
+		$this->Species->recursive = 0;
+
+		$this->Species->id = $id;
+		if (!$this->Species->exists()) {
+			throw new NotFoundException(__('Invalid species'));
+		}
+
+		$this->set('species', $this->Species->read(null, $id));
+	}
+
 }
