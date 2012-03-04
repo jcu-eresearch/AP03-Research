@@ -7,7 +7,12 @@ class Species extends AppModel {
 	public $name = 'Species';
 
 	// A Species has many occurrences.
-	public $hasMany = 'Occurrence';
+	public $hasMany = array(
+		'Occurrence' => array(
+			'className' => 'Occurrence',
+			'dependent' => true,
+		)
+	);
 
 	// Specify validation for Species
 	// See API: http://book.cakephp.org/2.0/en/models/data-validation.html
