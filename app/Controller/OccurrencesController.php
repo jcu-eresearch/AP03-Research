@@ -18,7 +18,7 @@ class OccurrencesController extends AppController {
 		$this->Occurrence->recursive = 0;
 		$this->set('occurrences', $this->paginate());
 
-		// Specify the output for the xml/json views.
+		// Specify the output for the json views.
 		$this->set('_serialize', 'occurrences');
 	}
 

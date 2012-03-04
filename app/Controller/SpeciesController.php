@@ -19,7 +19,7 @@ class SpeciesController extends AppController {
 		$this->Species->recursive = 0;
 		$this->set('species', $this->paginate());
 
-		// Specify the output for the xml/json views.
+		// Specify the output for the json views.
 		$this->set('_serialize', 'species');
 	}
 
