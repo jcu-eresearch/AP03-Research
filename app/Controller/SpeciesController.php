@@ -19,7 +19,7 @@ class SpeciesController extends AppController {
 		$this->Species->recursive = 0;
 		$this->set('species', $this->paginate());
 
-		// Specify the output for the json views.
+		// Specify the output for the json view.
 		$this->set('_serialize', 'species');
 	}
 
@@ -37,7 +37,35 @@ class SpeciesController extends AppController {
 			throw new NotFoundException(__('Invalid species'));
 		}
 		$this->set('species', $this->Species->read(null, $id));
+
+		// Specify the output for the json view.
+		$this->set('_serialize', 'species');
 	}
+
+/**
+ * occurrences method
+ *
+ * @param string $id
+ * @return void
+ */
+	public function occurrences($id = null) {
+		$this->set('title_for_layout', 'Species - Occurrences');
+
+		$this->Species->id = $id;
+		if (!$this->Species->exists()) {
+			throw new NotFoundException(__('Invalid species'));
+		}
+
+		$species = $this->Species->read(null, $id);
+		$occurrences = $species['Occurrence'];
+
+		$this->set('species', $species);
+		$this->set('occurrences', $occurrences);
+
+		// Specify the output for the json view.
+		$this->set('_serialize', 'occurrences');
+	}
+
 
 /**
  * add method

@@ -52,6 +52,7 @@ class OccurrencesController extends AppController {
 			}
 		}
 
+		$species = NULL;
 		if (array_key_exists('species_id', $this->request->query)) {
 			$species_id = $this->request->query['species_id'];
 			$species = $this->Occurrence->Species->find('list', array('conditions' => array('id' => $species_id)));
