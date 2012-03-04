@@ -19,11 +19,11 @@ GET /species/<species_id>/occurrences/<occurence_id>             (lists the deta
 
 *N.B.* These may change based on PHP Cake conventions
 
-DB Setup
+Setup
 ==========
 
-mysql
-------
+DB
+---------
 
 ```sql
 
