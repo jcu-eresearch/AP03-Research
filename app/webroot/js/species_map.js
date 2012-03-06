@@ -3,54 +3,6 @@
 // Assumes that the var species_id has already been set.
 // Assumes that open layers, jQuery and jQueryUI are all available.
 
-/*
-<script type="text/javascript">
-            var map, photos;
-            OpenLayers.ProxyHost = (window.location.host == "localhost") ?
-                "/cgi-bin/proxy.cgi?url=" : "proxy.cgi?url=";
-        
-            function init() {
-                map = new OpenLayers.Map('map', {
-                    restrictedExtent: new OpenLayers.Bounds(-180, -90, 180, 90)
-                });
-                var base = new OpenLayers.Layer.WMS("Imagery", 
-                    ["http://t1.hypercube.telascience.org/tiles?",
-		     "http://t2.hypercube.telascience.org/tiles?",
-		     "http://t3.hypercube.telascience.org/tiles?",
-		     "http://t4.hypercube.telascience.org/tiles?"], 
-                    {layers: 'landsat7'}
-                );
-
-                var style = new OpenLayers.Style({
-                    externalGraphic: "${img_url}",
-                    pointRadius: 30
-                });
-
-                photos = new OpenLayers.Layer.Vector("Photos", {
-                    strategies: [new OpenLayers.Strategy.BBOX()],
-                    protocol: new OpenLayers.Protocol.HTTP({
-                        url: "http://labs.metacarta.com/flickrbrowse/flickr.py/flickr",
-                        params: {
-                            format: "WFS",
-                            sort: "interestingness-desc",
-                            service: "WFS",
-                            request: "GetFeatures",
-                            srs: "EPSG:4326",
-                            maxfeatures: 10
-                        },
-                        format: new OpenLayers.Format.GML()
-                    }),
-                    styleMap: new OpenLayers.StyleMap(style)
-                });
-
-                map.addLayers([base, photos]);
-                map.setCenter(new OpenLayers.LonLat(-116.45, 35.42), 5);
-            }
-            
-        </script>
-    </head>
-*/
-
 var map, select_control;
 $(document).ready(function() {
 		map = new OpenLayers.Map('map', {
@@ -97,7 +49,7 @@ $(document).ready(function() {
 			// resFactor determines how often to update the map.
 			// See: http://dev.openlayers.org/docs/files/OpenLayers/Strategy/BBOX-js.html#OpenLayers.Strategy.BBOX.resFactor
 			// A setting of 1 will mean the map is updated every time its zoom/bounds change.
-			strategies: [new OpenLayers.Strategy.BBOX({resFactor: 1.0})],
+			strategies: [new OpenLayers.Strategy.BBOX({resFactor: 1.1})],
 			protocol: new OpenLayers.Protocol.HTTP({
 					url: "../geo_json_occurrences/" + species_id + ".json",
 					params: {
@@ -162,5 +114,14 @@ $(document).ready(function() {
 		// map.addControl(new OpenLayers.Control.LayerSwitcher());
 
 		map.addLayers([wms, occurrences]);
-		map.zoomToMaxExtent();
+		
+		// Zoom the map to cover the world.
+		//map.zoomToMaxExtent();
+
+		// Zoom the map to cover Australia
+		zoomBounds = new OpenLayers.Bounds();
+		zoomBounds.extend(new OpenLayers.LonLat(140,-40));
+		zoomBounds.extend(new OpenLayers.LonLat(160,-10));
+
+		map.zoomToExtent(zoomBounds);
 });

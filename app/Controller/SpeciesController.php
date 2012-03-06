@@ -102,12 +102,28 @@ class SpeciesController extends AppController {
 		$occurrences = $species['Occurrence'];
 
 		// Check if we were provided a bbox (bounding box)
-		$bbox = NULL;
+		$bbox = array();
 		if ( array_key_exists('bbox', $this->request->query) ) {
-			$bbox = $this->params->query['bbox'];
+			$bbox_param_string = $this->params->query['bbox'];
+			$bbox_param_as_array = explode(',', $bbox_param_string);
+			if ( sizeof($bbox_param_as_array) == 4 ) {
+				$bbox = array(
+					"min_longitude" => $bbox_param_as_array[0],
+					"min_latitude"  => $bbox_param_as_array[1],
+					"max_longitude" => $bbox_param_as_array[2],
+					"max_latitude"  => $bbox_param_as_array[3],
+				);
+			}
 		}
 
-		$geo_object = $this->Species->toGeoJSONArray();
+		// Check if clustered was set to true.
+		// Default clustered to true
+		$clustered = true;
+		if ( array_key_exists('clustered', $this->request->query) ) {
+			$clustered = $this->request->query['clustered'];
+		}
+
+		$geo_object = $this->Species->toGeoJSONArray($bbox, $clustered);
 
 		$this->set('geo_object', $geo_object);
 
@@ -203,7 +219,7 @@ class SpeciesController extends AppController {
 
 			// Expected file type is application/json
 			if ($file_type != 'application/json') {
-				$this->Session->setFlash(__('The species file must be of type application/json. Upload file could not be processed. Please, try again.'));
+				$this->Session->setFlash(__('The species file must be of type application/json. You supplied: '.$file_type.'. Upload file could not be processed. Please, try again.'));
 			} else {
 				$file_contents = file_get_contents($tmp_file_path);
 				$json_decoded_file_contents = json_decode($file_contents, true);
