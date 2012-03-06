@@ -6,6 +6,10 @@
 class Species extends AppModel {
 	public $name = 'Species';
 
+	public $actsAs = array(
+		'Geolocations' => array()
+	);
+
 	// A Species has many occurrences.
 	public $hasMany = array(
 		'Occurrence' => array(
@@ -35,4 +39,9 @@ class Species extends AppModel {
 			)
 		)
 	);
+
+	// Return an array of locations
+	public function getLocationsArray() {
+		return $this->data['Occurrence'];
+	}
 }

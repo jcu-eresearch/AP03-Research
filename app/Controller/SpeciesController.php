@@ -64,6 +64,55 @@ class SpeciesController extends AppController {
 
 		// Specify the output for the json view.
 		$this->set('_serialize', 'occurrences');
+
+	}
+
+/**
+ * geo_json_occurrences method
+ *
+ * Takes the following http_request_params:
+ *  * bbox
+ *
+ * bbox is a comma seperated string representing the bounds of the user's view.
+ * e.g. whole world, zoomed out:
+ *      -607.5,-405,607.5,405
+ *
+ * e.g. bottom left corner of world, zoomed in:
+ *      -198.984375,-102.65625,-123.046875,-52.03125
+ *
+ * 1st pair is the bottom left corner of the bounds.
+ * 2nd pair is the top right corner of the bounds.
+ *
+ * Produces a GeoJSON object of type FeatureCollection.
+ * Should only produce, at most, 100 features.
+ *
+ * @param string $id
+ * @return void
+ */
+	public function geo_json_occurrences($id = null) {
+		$this->set('title_for_layout', 'Species - GeoJSON Occurrences');
+
+		$this->Species->id = $id;
+		if (!$this->Species->exists()) {
+			throw new NotFoundException(__('Invalid species'));
+		}
+
+		// Look up the species provided
+		$species = $this->Species->read(null, $id);
+		$occurrences = $species['Occurrence'];
+
+		// Check if we were provided a bbox (bounding box)
+		$bbox = NULL;
+		if ( array_key_exists('bbox', $this->request->query) ) {
+			$bbox = $this->params->query['bbox'];
+		}
+
+		$geo_object = $this->Species->toGeoJSONArray();
+
+		$this->set('geo_object', $geo_object);
+
+		// Specify the output for the json view.
+		$this->set('_serialize', 'geo_object');
 	}
 
 
