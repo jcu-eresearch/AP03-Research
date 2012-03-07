@@ -59,6 +59,7 @@
  */
 class DATABASE_CONFIG {
 
+/*
 	public $default = array(
 		'datasource' => 'Database/Mysql',
 		'persistent' => false,
@@ -79,6 +80,28 @@ class DATABASE_CONFIG {
 		'login' => 'CakePHP-29576',
 		'password' => 'testTest2',
 		'database' => 'ap_03_phpfogapp_com',
+		'prefix' => 'test_',
+		//'encoding' => 'utf8',
+	);
+*/
+	public $default = array(
+		'datasource' => 'Database/Sqlite',
+		'persistent' => false,
+		'host' => 'localhost',
+		'login' => '',
+		'password' => '',
+		'database' => '../DB/development.sqlite_db',
+		'prefix' => '',
+		//'encoding' => 'utf8',
+	);
+
+	public $test = array(
+		'datasource' => 'Database/Sqlite',
+		'persistent' => false,
+		'host' => 'localhost',
+		'login' => '',
+		'password' => '',
+		'database' => '../DB/test.sqlite_db',
 		'prefix' => 'test_',
 		//'encoding' => 'utf8',
 	);
