@@ -88,9 +88,6 @@ class GeolocationsBehavior extends ModelBehavior {
 			}
 
 			for ($i = 0; $i < sizeOf($transformed_array); $i++) {
-				//print_r(array('tl' => $transform_longitude, 'max_long' => $max_longitude, 'min_long' => $min_longitude));
-				//print_r(array('tl' => $transform_latitude, 'max_lat' => $max_latitude, 'min_lat' => $min_latitude));
-				//echo "\n";
 				$original_longitude_approximation = ( ( $i * $transform_longitude) + $min_longitude + ( $transform_longitude / 2) );
 				for ($j = 0; $j < sizeOf($transformed_array[$i]); $j++) {
 					$locations_approximately_here       = $transformed_array[$i][$j];
@@ -98,7 +95,7 @@ class GeolocationsBehavior extends ModelBehavior {
 					if ($locations_approximately_here_size > 0) {
 						$original_latitude_approximation  = ( ( $j * $transform_latitude) + $min_latitude + ( $transform_latitude / 2 ));
 						$point_radius = ( ceil(log($locations_approximately_here_size) ) + $min_feature_radius);
-						array_push($locationFeatures,array(
+						$locationFeatures[] = array(
 							"type" => "Feature",
 							'properties' => array(
 								'point_radius' => $point_radius,
@@ -108,7 +105,7 @@ class GeolocationsBehavior extends ModelBehavior {
 								'type' => 'Point',
 								'coordinates' => array($original_longitude_approximation, $original_latitude_approximation),
 							),
-						));
+						);
 					}
 				}
 			}
@@ -118,7 +115,7 @@ class GeolocationsBehavior extends ModelBehavior {
 				$longitude = $location['longitude'];
 				$latitude = $location['latitude'];
 				if ( GeolocationsBehavior::withinBounds($longitude, $latitude, $bounds) ) {
-					array_push($locationFeatures,array(
+					$locationFeatures[] = array(
 						"type" => "Feature",
 						'properties' => array(
 							'point_radius' => 4
@@ -127,14 +124,14 @@ class GeolocationsBehavior extends ModelBehavior {
 							'type' => 'Point',
 							'coordinates' => array($location['longitude'], $location['latitude']),
 						),
-					));
+					);
 				}
 			}
 		}
 
 		$geoObject = array(
 			'type' => 'FeatureCollection',
-			'features' => $locationFeatures
+			'features' => &$locationFeatures
 		);
 		return $geoObject;
 	}
