@@ -27,9 +27,40 @@ Setup
 php.ini
 ---------
 
-To allow for large species file uploads, it may be necessary to increase <code>max_execution_time</code>.
-In my case, it took approximately 1 minute to upload and process a species with 130k occurrences.
-I have set <code>max_execution_time</code> to 300, to be on the safe side.
+The following are the changes I have made to the php.ini file.
+
+```php
+
+; max_execution_time = 30
+max_execution_time = 300
+
+
+; memory_limit = 128M
+memory_limit = 1024M
+
+
+; error_reporting = E_ALL & ~E_DEPRECATED
+error_reporting = E_ALL | STRICT
+
+
+; upload_max_filesize = 2M
+upload_max_filesize = 20M
+
+; date.timezone =
+date.timezone = 'Australia/Brisbane'
+
+```
+
+To allow for large species file uploads, it may be necessary to increase both the <code>max_execution_time</code> and the <code>upload_max_filesize</code>.
+In my case, it took approximately 4 minutes to upload and process a json formatted file containing a species and its approx 130k occurrences (a 4MB file).
+
+The generation of the geoJSON cluster information consumes large amounts of memory. It is *very* likely that this could be opmitimized.
+For now, increase the <code>memory_limit</code> to at least 512M. I have increased it to 1024M to be on the safe side.
+
+I have increased my <code>error_reporting</code>. You don't need to do this to run the applcication.
+
+I have set <code>date.timezone</code>. Without this being set, cakephp produced a significant number of date related warnings.
+
 
 DB
 ---------
