@@ -1,4 +1,5 @@
 Routes
+
 ==========
 
 Proposed RESTful URL patterns:
@@ -65,6 +66,9 @@ I have set <code>date.timezone</code>. Without this being set, cakephp produced 
 DB
 ---------
 
+mysql
+---------
+
 ```sql
 
 CREATE TABLE species (
@@ -76,6 +80,29 @@ CREATE TABLE species (
 
 CREATE TABLE occurrences (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    species_id INT UNSIGNED,
+    latitude DECIMAL(12,9) NOT NULL,
+    longitude DECIMAL(12,9) NOT NULL,
+    created DATETIME DEFAULT NULL,
+    modified DATETIME DEFAULT NULL
+);
+
+```
+
+sqlite
+---------
+
+```sql
+
+CREATE TABLE species (
+    id INTEGER PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    created DATETIME DEFAULT NULL,
+    modified DATETIME DEFAULT NULL
+);
+
+CREATE TABLE occurrences (
+    id INTEGER PRIMARY KEY,
     species_id INT UNSIGNED,
     latitude DECIMAL(12,9) NOT NULL,
     longitude DECIMAL(12,9) NOT NULL,
