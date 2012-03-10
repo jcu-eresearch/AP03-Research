@@ -40,7 +40,7 @@
 /**
  * Tell cake php to parse json extensions
  */
-	Router::parseExtensions('json');
+	Router::parseExtensions('json', 'csv');
 
 /**
  * Load the CakePHP default routes. Remove this if you do not want to use
