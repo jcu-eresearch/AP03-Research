@@ -10,3 +10,12 @@ dl {
 	background-color: #fff;
 	color: #000;
 }
+
+#map * {
+	float: none;
+}
+
+#map input {
+	margin: 0.2em;
+	padding: 0.1em;
+}
