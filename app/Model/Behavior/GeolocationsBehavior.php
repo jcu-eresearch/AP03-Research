@@ -71,27 +71,23 @@ class GeolocationsBehavior extends ModelBehavior {
 				)
 			);
 			
-			$max_occurrences_at_approximate_location = 1;
 			foreach($locations as &$location) {
-				$longitude = $location['longitude'];
-				$latitude = $location['latitude'];
+				$longitude = &$location['longitude'];
+				$latitude = &$location['latitude'];
 				if ( GeolocationsBehavior::withinBounds($longitude, $latitude, $bounds) ) {
 					$transformed_longitude = floor( ( $longitude - $min_longitude ) / $transform_longitude );
 					$transformed_latitude  = floor( ( $latitude - $min_latitude ) / $transform_latitude );
+					$this_occurrences_array = &$transformed_array[$transformed_longitude][$transformed_latitude];
 
-					array_push($transformed_array[$transformed_longitude][$transformed_latitude], $location['id']);
-					$occurrences_at_approximate_location = sizeOf($transformed_array[$transformed_longitude][$transformed_latitude]);
-					if ( $max_occurrences_at_approximate_location < $occurrences_at_approximate_location) {
-						$max_occurrences_at_approximate_location = $occurrences_at_approximate_location;
-					}
+					$this_occurrences_array[] = $location['id'];
 				}
 			}
 
 			for ($i = 0; $i < sizeOf($transformed_array); $i++) {
 				$original_longitude_approximation = ( ( $i * $transform_longitude) + $min_longitude + ( $transform_longitude / 2) );
 				for ($j = 0; $j < sizeOf($transformed_array[$i]); $j++) {
-					$locations_approximately_here       = $transformed_array[$i][$j];
-					$locations_approximately_here_size  = sizeOf($transformed_array[$i][$j]);
+					$locations_approximately_here       = &$transformed_array[$i][$j];
+					$locations_approximately_here_size  = sizeOf($locations_approximately_here);
 					if ($locations_approximately_here_size > 0) {
 						$original_latitude_approximation  = ( ( $j * $transform_latitude) + $min_latitude + ( $transform_latitude / 2 ));
 						$point_radius = ( ceil(log($locations_approximately_here_size) ) + $min_feature_radius);
