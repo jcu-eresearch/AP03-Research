@@ -19,6 +19,13 @@ $(document).ready(function() {
 			{'layers':'basic'} 
 		);
 
+		var dist = new OpenLayers.Layer.WMS(
+			"Dist",
+			'/map?MODE=map&MAP=tiff.map',
+			{speciesId: species_id, reaspect: "true", transparent: 'true'},
+			{isBaseLayer: false, opacity: 0.9}
+		);
+
 		// Google Maps Layers
 		// These require a google maps API key
 		var gphy = new OpenLayers.Layer.Google(
@@ -111,9 +118,9 @@ $(document).ready(function() {
 		select_control.activate();
 		
 		// Let the user change between layers
-		// map.addControl(new OpenLayers.Control.LayerSwitcher());
+		map.addControl(new OpenLayers.Control.LayerSwitcher());
 
-		map.addLayers([wms, occurrences]);
+		map.addLayers([wms, gphy, gmap, ghyb, gsat, dist, occurrences]);
 		
 		// Zoom the map to cover the world.
 		//map.zoomToMaxExtent();
