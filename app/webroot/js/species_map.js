@@ -5,44 +5,66 @@
 
 var map, select_control;
 $(document).ready(function() {
+		geographic = new OpenLayers.Projection("EPSG:4326");
+		mercator = new OpenLayers.Projection("EPSG:900913");
+
 		map = new OpenLayers.Map('map', {
 			// Don't let the user move the map outside of the bounds of the earth
 			// Some maps support wrap-around, others don't.
 			// To make everything simpler (incl. our BBox strategy), just prevent it from happening.
-			restrictedExtent: new OpenLayers.Bounds(-180, -90, 180, 90)
+			restrictedExtent: new OpenLayers.Bounds(-180, -90, 180, 90),
+			displayProjection: geographic,
+			projection: geographic,
 		});
 
 		// The standard open layers layer.
 		var wms = new OpenLayers.Layer.WMS(
 			"OpenLayers WMS",
 			"http://vmap0.tiles.osgeo.org/wms/vmap0",
-			{'layers':'basic'} 
+			{'layers':'basic', projection: geographic} 
 		);
 
 		var dist = new OpenLayers.Layer.WMS(
-			"Dist",
-			'/map?MODE=map&MAP=tiff.map',
-			{speciesId: species_id, reaspect: "true", transparent: 'true'},
-			{isBaseLayer: false, opacity: 0.9}
+			"Distribution",
+			'/map',
+			{MODE: 'map', MAP: 'raster.map', DATA: (species_id + '_1975.asc'), SPECIESID: species_id, REASPECT: "false", TRANSPARENT: 'true'},
+			{isBaseLayer: false, opacity: 0.9, projection: geographic}
 		);
 
 		// Google Maps Layers
 		// These require a google maps API key
 		var gphy = new OpenLayers.Layer.Google(
 				"Google Physical",
-				{type: G_PHYSICAL_MAP}
+				{
+					type: G_PHYSICAL_MAP,
+//					'sphericalMercator': true,
+//					'maxExtent': new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
+				}
 		);
 		var gmap = new OpenLayers.Layer.Google(
-				"Google Streets",
-				{numZoomLevels: 20}
+				"Google Streets", // the default
+				{
+					numZoomLevels:20,
+//					'sphericalMercator': true,
+//					'maxExtent': new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
+				}
 		);
 		var ghyb = new OpenLayers.Layer.Google(
 				"Google Hybrid",
-				{type: G_HYBRID_MAP, numZoomLevels: 20}
+				{
+					type: G_HYBRID_MAP,
+//					'sphericalMercator': true,
+//					'maxExtent': new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
+				}
 		);
 		var gsat = new OpenLayers.Layer.Google(
 				"Google Satellite",
-				{type: G_SATELLITE_MAP, numZoomLevels: 22}
+				{
+					type: G_SATELLITE_MAP,
+					numZoomLevels: 22,
+//					'sphericalMercator': true,
+//					'maxExtent': new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
+				}
 		);
 
 		var style = new OpenLayers.Style({
@@ -52,6 +74,10 @@ $(document).ready(function() {
 				fillOpacity: 0.4,
 		});
 
+		var mformat = new OpenLayers.Format.GeoJSON({
+//			'internalProjection': geographic,
+//			'externalProjection': geographic 
+		});
 		var occurrences = new OpenLayers.Layer.Vector("Occurrences", {
 			// resFactor determines how often to update the map.
 			// See: http://dev.openlayers.org/docs/files/OpenLayers/Strategy/BBOX-js.html#OpenLayers.Strategy.BBOX.resFactor
@@ -66,7 +92,8 @@ $(document).ready(function() {
 					},
 
 					// See: http://geojson.org/geojson-spec.html For the GeoJSON spec.
-					format: new OpenLayers.Format.GeoJSON(),
+//					format: new OpenLayers.Format.GeoJSON(),
+					format: mformat,
 			}),
 			styleMap: new OpenLayers.StyleMap({
 				"default": style,
@@ -114,13 +141,16 @@ $(document).ready(function() {
 			occurrences, {hover: false}
 		);
 
+		map.addControl(new OpenLayers.Control.Permalink());
+		map.addControl(new OpenLayers.Control.MousePosition());
 		map.addControl(select_control);
 		select_control.activate();
 		
 		// Let the user change between layers
 		map.addControl(new OpenLayers.Control.LayerSwitcher());
 
-		map.addLayers([wms, gphy, gmap, ghyb, gsat, dist, occurrences]);
+//		map.addLayers([wms, gphy, gmap, ghyb, gsat, dist, occurrences]);
+		map.addLayers([wms, dist, occurrences]);
 		
 		// Zoom the map to cover the world.
 		//map.zoomToMaxExtent();

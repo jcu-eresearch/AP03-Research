@@ -30,13 +30,16 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
 
 		echo $this->Html->css('cake.generic');
 		echo $this->Html->css('screen');
+		echo $this->Html->css('openlayers');
+		echo $this->Html->css('openlayers_google');
 
 		// Include jQuery and jQueryUI
 		echo $this->Html->script('jquery-ui-1.8.18/js/jquery-1.7.1.min.js');
 		echo $this->Html->script('jquery-ui-1.8.18/js/jquery-ui-1.8.18.custom.min.js');
 
 		// Include Google API
-		echo '<script type="text/javascript" src="https://maps.google.com/maps?file=api&amp;v=2&key=AIzaSyAmX6UOsuiIrSV_p3pUL8pelYLw8AnBTjU"></script>';
+		echo "<script src='http://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyAo3TVBlAHxH57sROb2cV_7-Tar7bKnIcY'></script>";
+		// echo '<script src="http://maps.google.com/maps/api/js?v=3.6&amp;sensor=false"></script>';
 
 		// Include OpenLayers
 		echo '<script src="http://openlayers.org/api/OpenLayers.js"></script>';
