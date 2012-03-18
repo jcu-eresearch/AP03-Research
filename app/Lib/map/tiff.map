@@ -20,8 +20,8 @@ MAP
 
 #define the folder that used for generate image
     WEB
-        IMAGEPATH 'tmp/'
-        IMAGEURL 'tmp/'
+        IMAGEPATH '/tmp/'
+        IMAGEURL '/tmp/'
     END
 
 #the layer for raster data. you can put multiple layers in one map file

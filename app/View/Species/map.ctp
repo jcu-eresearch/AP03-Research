@@ -1,5 +1,8 @@
 <?php
-	$code_block = "var species_id = '".$species['Species']['id']."';";
+	// Inject javascript to specify species_id and map_tool_url.
+	$map_tool_url = $this->Html->url(array("controller" => "tools", "action" => "map"));
+	$code_block =  "var species_id = '".$species['Species']['id']."';\n".
+	               "var map_tool_url = '".$map_tool_url."';";
 	echo $this->Html->scriptBlock($code_block, array('block' => 'script')); 
 
 	// Include map javascript files
