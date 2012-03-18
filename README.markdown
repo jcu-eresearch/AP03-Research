@@ -47,6 +47,11 @@ error_reporting = E_ALL | STRICT
 ; upload_max_filesize = 2M
 upload_max_filesize = 20M
 
+
+;post_max_size = 8M
+post_max_size = 20M
+
+
 ; date.timezone =
 date.timezone = 'Australia/Brisbane'
 
