@@ -27,6 +27,7 @@ $(document).ready(function() {
 		var dist = new OpenLayers.Layer.WMS(
 			"Distribution",
 			map_tool_url,
+			// Params to send as part of request (note: keys will be auto-upcased)
 			{MODE: 'map', MAP: 'raster.map', DATA: (species_id + '_1975.asc'), SPECIESID: species_id, REASPECT: "false", TRANSPARENT: 'true'},
 			{isBaseLayer: false, opacity: 0.9, projection: geographic}
 		);
