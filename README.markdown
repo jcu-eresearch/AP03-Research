@@ -21,6 +21,7 @@ GET /species                                       (lists the known species)
 GET /species/view/<species_id>                     (lists the details of a specific species)
 GET /species/map/<species_id>                      (view a map for a single species)
 GET /species/occurrences/<species_id>              (lists all occurrences of a given a species)
+GET /species/single_upload_json                    (form to upload a new species record from well-formatted json)
 ```
 
 *species (api)*:
