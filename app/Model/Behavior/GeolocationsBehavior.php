@@ -6,8 +6,13 @@
  * Each location must have at least a latitude and longitude.
  */
 class GeolocationsBehavior extends ModelBehavior {
+	const GRID_RANGE_LONGITUDE = 80;    // how many longitude slices to make (cut into GRID_RANGE_LONGITUDE along the x axis)
+	const GRID_RANGE_LATITUDE  = 40;    // how many latitude slices to make (cut into GRID_RANGE_LATITUDE along the y axis)
+	const MIN_FEATURE_RADIUS   = 4;     // pixels
 
-	// Store the settings for this model.
+	/**
+	 * Store the settings for this model.
+	 */
 	public function setup($Model, $config = array()) {
 		$settings = $config;
 		$this->settings[$Model->alias] = $settings;
@@ -20,25 +25,30 @@ class GeolocationsBehavior extends ModelBehavior {
 	 * bounds is an array of min_latitude, max_latitude, min_longitude, max_longitude
 	 *
 	 * If clustered is true, then bounds are required.
+	 *
 	 * Clustered will return features in clusters, rather than a single feature per location.
 	 */
 	public function toGeoJSONArray(Model $Model, $bounds = array(), $clustered=false ) {
 		$locations = $Model->getLocationsArray();
-		$locationFeatures = array();
+		$location_features = array();
 
 		if ( $clustered ) {
-			// TODO Convert to constants
-			$grid_range_longitude = 80;
-			$grid_range_latitude  = 40;
-			$min_feature_radius = 3;
-
-			if ( !array_key_exists('min_latitude', $bounds) ) {}
-			if ( !array_key_exists('max_latitude', $bounds) ) {}
-			if ( !array_key_exists('min_longitude', $bounds) ) {}
-			if ( !array_key_exists('max_longitude', $bounds) ) {}
+			// When the request is clustered, we require all bounds params to be set.
+			if ( !array_key_exists('min_latitude', $bounds) ) {
+				throw new BadRequestException(__('min_latitude bounds required when request is clustered.'));
+			}
+			if ( !array_key_exists('max_latitude', $bounds) ) {
+				throw new BadRequestException(__('max_latitude bounds required when request is clustered.'));
+			}
+			if ( !array_key_exists('min_longitude', $bounds) ) {
+				throw new BadRequestException(__('min_longitude bounds required when request is clustered.'));
+			}
+			if ( !array_key_exists('max_longitude', $bounds) ) {
+				throw new BadRequestException(__('max_longitude bounds required when request is clustered.'));
+			}
 
 			// Use a grid cluster technique.
-			// Cut the map up into a grid of 50 x 50
+			// Cut the map up into a grid of GRID_RANGE_LONGITUDE x GRID_RANGE_LATITUDE
 			// The grid is based on the bounds.
 			// Transform all locations to the nearest grid position
 			$min_longitude = $bounds['min_longitude'];
@@ -46,56 +56,83 @@ class GeolocationsBehavior extends ModelBehavior {
 			$min_latitude = $bounds['min_latitude'];
 			$max_latitude = $bounds['max_latitude'];
 			
-			// if min_lat 30 and max_lat 90
-			// max_lat - min_lat = 60
-			// 60 is range.
-			// grid is 50.
-			// 60/50 is 1.2.
-			// Each grid point is 1.2 up/down
-			// A occurrence at 30 should be in array location 0
-			// An occurrence at 40 should be in array location 8
-			// An occurrence at 90 should be in array location 50
-			// transform is: ( occur_lat - min_lat ) / transform_lat
-			// transform_lat = ( max_lat - min_lat ) * range
-			$transform_longitude = ( $max_longitude - $min_longitude ) / $grid_range_longitude;
-			$transform_latitude = ( $max_latitude - $min_latitude ) / $grid_range_latitude;
+			/*
+				The following is a thought dump..
+				It describes the clustering algorithm used.
+				(assumes GRID_RANGE_LONGITUDE .nd GRID_RANGE_LATITUDE are 50)
+					if min_lat 30 and max_lat 90
+					max_lat - min_lat = 60
+					60 is lat range.
+					grid is 50
+					60/50 is 1.2.
+					Each grid point is 1.2 up/down
+					A occurrence at 30 should be in array location 0    => ( 30 - 30 ) / 1.2
+					An occurrence at 40 should be in array location 8   => ( 40 - 30 ) / 1.2
+					An occurrence at 90 should be in array location 50  => ( 90 - 30 ) / 1.2
+					transform is: ( occur_lat - min_lat ) / transform_lat
+					transform_lat = ( max_lat - min_lat ) / range ( 1.2 in our example )
+			*/
+			$transform_longitude = ( $max_longitude - $min_longitude ) / GeolocationsBehavior::GRID_RANGE_LONGITUDE;
+			$transform_latitude = ( $max_latitude - $min_latitude ) / GeolocationsBehavior::GRID_RANGE_LATITUDE;
 
-			// Create a 2x2 array. Outside array is longitude. Inner array is latitude.
+			// Create a 2x2 array of the correct dimensions. Outside array is longitude. Inner array is latitude.
 			$transformed_array = array_fill(
 				0,
-				$grid_range_longitude, 
+				GeolocationsBehavior::GRID_RANGE_LONGITUDE,
 				array_fill(
 					0, 
-					$grid_range_latitude, 
+					GeolocationsBehavior::GRID_RANGE_LATITUDE,
 					array()
 				)
 			);
 			
-			foreach($locations as &$location) {
-				$longitude = &$location['longitude'];
-				$latitude = &$location['latitude'];
+			// Iterate over the locations (pass instance location by reference)
+			foreach($locations as $location) {
+				$longitude = $location['longitude'];
+				$latitude = $location['latitude'];
+				// If the location is within the bounds,
+				// then place the location's id within the transformed array at the transformed grid location
 				if ( GeolocationsBehavior::withinBounds($longitude, $latitude, $bounds) ) {
+					// transform the latitude and longitude into our grid co-ordinates
 					$transformed_longitude = floor( ( $longitude - $min_longitude ) / $transform_longitude );
 					$transformed_latitude  = floor( ( $latitude - $min_latitude ) / $transform_latitude );
-					$this_occurrences_array = &$transformed_array[$transformed_longitude][$transformed_latitude];
 
-					$this_occurrences_array[] = $location['id'];
+					// Look up the grid array for this transformed location
+					$this_locations_array = &$transformed_array[$transformed_longitude][$transformed_latitude];
+
+					// Append the location's id into the grid's array
+					$this_locations_array[] = $location['id'];
 				}
 			}
 
+			// Iterate over our transformed array (our grid array)
 			for ($i = 0; $i < sizeOf($transformed_array); $i++) {
+				// i is the longitude indicator
+				// using i, estimate the center of this grid coordinate (along the longitude axis)
 				$original_longitude_approximation = ( ( $i * $transform_longitude) + $min_longitude + ( $transform_longitude / 2) );
 				for ($j = 0; $j < sizeOf($transformed_array[$i]); $j++) {
-					$locations_approximately_here       = &$transformed_array[$i][$j];
+					// j is the longitude indicator
+					$locations_approximately_here       = $transformed_array[$i][$j];
 					$locations_approximately_here_size  = sizeOf($locations_approximately_here);
 					if ($locations_approximately_here_size > 0) {
+						// using j, estimate the center of this grid coordinate (along the latitude axis)
 						$original_latitude_approximation  = ( ( $j * $transform_latitude) + $min_latitude + ( $transform_latitude / 2 ));
-						$point_radius = ( ceil(log($locations_approximately_here_size) ) + $min_feature_radius);
-						$locationFeatures[] = array(
+						// Using log (with floor), determine the size of the clustered feature.
+						// 1-9       items = 0 + MIN_FEATURE_RADIUS
+						// 10-99     items = 1 + MIN_FEATURE_RADIUS
+						// 100-999   items = 2 + MIN_FEATURE_RADIUS
+						// 1000-9999 items = 3 + MIN_FEATURE_RADIUS
+						// etc.
+						// Note: we subtract 1 as MIN_FEATURE_RADIUS should be correct for a cluster of 1
+
+						// Create a well-formatted GeoJSON array for this cluster, and append it to our location_features array
+						$point_radius = ( floor(log($locations_approximately_here_size) ) + GeolocationsBehavior::MIN_FEATURE_RADIUS );
+						$location_features[] = array(
 							"type" => "Feature",
 							'properties' => array(
 								'point_radius' => $point_radius,
 								'title' => "".$locations_approximately_here_size." occurrences",
+								'description' => "",
 							),
 							'geometry' => array(
 								'type' => 'Point',
@@ -107,11 +144,11 @@ class GeolocationsBehavior extends ModelBehavior {
 			}
 
 		} else {
-			foreach($locations as &$location) {
+			foreach($locations as $location) {
 				$longitude = $location['longitude'];
 				$latitude = $location['latitude'];
 				if ( GeolocationsBehavior::withinBounds($longitude, $latitude, $bounds) ) {
-					$locationFeatures[] = array(
+					$location_features[] = array(
 						"type" => "Feature",
 						'properties' => array(
 							'point_radius' => 4
@@ -127,15 +164,14 @@ class GeolocationsBehavior extends ModelBehavior {
 
 		$geoObject = array(
 			'type' => 'FeatureCollection',
-			'features' => &$locationFeatures
+			'features' => $location_features
 		);
 		return $geoObject;
 	}
 
-
 	public static function getLocationsWithinBounds($locations, $bounds = array()) {
 		$returnArray = array();
-		foreach($locations as &$location) {
+		foreach($locations as $location) {
 			$longitude = $location['longitude'];
 			$latitude = $location['latitude'];
 			if ( GeolocationsBehavior::withinBounds($longitude, $latitude, $bounds) ) {
@@ -158,20 +194,6 @@ class GeolocationsBehavior extends ModelBehavior {
 	 * Bounds can be an empty array.
 	 */
 	public static function withinBounds($longitude, $latitude, $bounds = array()) {
-		// > max lat
-		if ( array_key_exists('max_latitude', $bounds) ) {
-			if ( $latitude > $bounds['max_latitude'] ) {
-				return false;
-			}
-		}
-
-		// < min lat
-		if ( array_key_exists('min_latitude', $bounds) ) {
-			if ( $latitude < $bounds['min_latitude'] ) {
-				return false;
-			}
-		}
-
 		// > max lon
 		if ( array_key_exists('max_longitude', $bounds) ) {
 			if ( $longitude > $bounds['max_longitude'] ) {
@@ -182,6 +204,20 @@ class GeolocationsBehavior extends ModelBehavior {
 		// < max lon
 		if ( array_key_exists('min_longitude', $bounds) ) {
 			if ( $longitude < $bounds['min_longitude'] ) {
+				return false;
+			}
+		}
+
+		// > max lat
+		if ( array_key_exists('max_latitude', $bounds) ) {
+			if ( $latitude > $bounds['max_latitude'] ) {
+				return false;
+			}
+		}
+
+		// < min lat
+		if ( array_key_exists('min_latitude', $bounds) ) {
+			if ( $latitude < $bounds['min_latitude'] ) {
 				return false;
 			}
 		}
