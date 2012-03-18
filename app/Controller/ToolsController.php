@@ -47,7 +47,7 @@ class ToolsController extends AppController {
 			throw new BadRequestException(__('Invalid query. Missing DATA query parameter'));
 		}
 
-		$layer = $map->getLayerByName('TEMPDATA');
+		$layer = $map->getLayerByName('DISTRIBUTION');
 		$layer->set('data', $data);
 
 		$map_image = $map->draw();
