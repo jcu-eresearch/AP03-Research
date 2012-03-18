@@ -84,7 +84,7 @@ class SpeciesController extends AppController {
  * 2nd pair is the top right corner of the bounds.
  *
  * Produces a GeoJSON object of type FeatureCollection.
- * Should only produce, at most, 100 features.
+ * Should only produce, at most, 1000 features.
  *
  * @param string $id
  * @return void
@@ -99,7 +99,6 @@ class SpeciesController extends AppController {
 
 		// Look up the species provided
 		$species = $this->Species->read(null, $id);
-		$occurrences = $species['Occurrence'];
 
 		// Check if we were provided a bbox (bounding box)
 		$bbox = array();
@@ -123,9 +122,7 @@ class SpeciesController extends AppController {
 			$clustered = $this->request->query['clustered'];
 		}
 
-		$geo_object = $this->Species->toGeoJSONArray($bbox, $clustered);
-
-		$this->set('geo_object', $geo_object);
+		$this->set('geo_object', $this->Species->toGeoJSONArray($bbox, $clustered));
 
 		// Specify the output for the json view.
 		$this->set('_serialize', 'geo_object');
