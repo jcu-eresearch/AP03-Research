@@ -1,23 +1,40 @@
 Routes
-
 ==========
 
 Proposed RESTful URL patterns:
 ---------------------------------
 
-```
 .json extensions should be supported for Ajax requests
 (consider .xml if more appropriate for cake framework)
 
-GET /users                                                       (lists all users)
-GET /users/view/<user_id>                                        (lists the details of a specific user)
+*users (browser)*:
 
-GET /species                                                     (lists the known species)
-GET /species/view/<species_id>                                   (lists the details of a specific species)
-GET /species/occurrences/<species_id>                            (lists all occurrences of a given a species)
+```
+GET /users                                         (lists all users)
+GET /users/view/<user_id>                          (lists the details of a specific user)
+```
 
-GET /occurrences                                                 (lists all occurrences)
-GET /occurrences/<occurence_id>                                  (lists the details of a specific occurrence)
+*species (browser)*:
+
+```
+GET /species                                       (lists the known species)
+GET /species/view/<species_id>                     (lists the details of a specific species)
+GET /species/map/<species_id>                      (view a map for a single species)
+GET /species/occurrences/<species_id>              (lists all occurrences of a given a species)
+```
+
+*species (api)*:
+
+```
+GET /species/occurrences/<species_id>.csv          (produces a CSV file compatible with climate change impact distribution modelling)
+GET /species/geo_json_occurrences.json             (produces a json file with the occurrences in GeoJSON format. Optional query args: bbox and clustered)
+```
+
+*occurrences (browser)*:
+
+```
+GET /occurrences                                   (lists all occurrences)
+GET /occurrences/<occurence_id>                    (lists the details of a specific occurrence)
 ```
 
 *N.B.* These may change based on PHP Cake conventions
@@ -33,7 +50,7 @@ The following are the changes I have made to the php.ini file.
 ```php
 
 ; max_execution_time = 30
-max_execution_time = 300
+max_execution_time = 1000
 
 
 ; memory_limit = 128M
@@ -57,8 +74,8 @@ date.timezone = 'Australia/Brisbane'
 
 ```
 
-To allow for large species file uploads, it may be necessary to increase both the <code>max_execution_time</code> and the <code>upload_max_filesize</code>.
-In my case, it took approximately 4 minutes to upload and process a json formatted file containing a species and its approx 130k occurrences (a 4MB file).
+To allow for large species file uploads, it may be necessary to increase <code>max_execution_time</code>, <code>post_max_size</code> and the <code>upload_max_filesize</code>.
+In my case, it took approximately 13 minutes to upload and process a json formatted file containing a species and its approx 330k occurrences (a 16MB file).
 
 The generation of the geoJSON cluster information consumes large amounts of memory. It is *very* likely that this could be opmitimized.
 For now, increase the <code>memory_limit</code> to at least 512M. I have increased it to 1024M to be on the safe side.

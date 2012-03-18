@@ -26,6 +26,7 @@
 <div class="actions">
 	<h3><?php echo __('Actions'); ?></h3>
 	<ul>
+		<li><?php echo $this->Html->link(__('Species Map'), array('action' => 'map', $species['Species']['id'])); ?> </li>
 		<li><?php echo $this->Html->link(__('Edit Species'), array('action' => 'edit', $species['Species']['id'])); ?> </li>
 		<li><?php echo $this->Form->postLink(__('Delete Species'), array('action' => 'delete', $species['Species']['id']), null, __('Are you sure you want to delete # %s?', $species['Species']['id'])); ?> </li>
 		<li><?php echo $this->Html->link(__('List Species'), array('action' => 'index')); ?> </li>

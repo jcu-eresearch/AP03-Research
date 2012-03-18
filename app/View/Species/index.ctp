@@ -17,6 +17,7 @@
 		<td><?php echo h($species['Species']['modified']); ?>&nbsp;</td>
 		<td class="actions">
 			<?php echo $this->Html->link(__('View'), array('action' => 'view', $species['Species']['id'])); ?>
+			<?php echo $this->Html->link(__('Map'),  array('action' => 'map', $species['Species']['id'])); ?>
 			<?php echo $this->Html->link(__('Edit'), array('action' => 'edit', $species['Species']['id'])); ?>
 			<?php echo $this->Form->postLink(__('Delete'), array('action' => 'delete', $species['Species']['id']), null, __('Are you sure you want to delete # %s?', $species['Species']['id'])); ?>
 		</td>
@@ -41,6 +42,7 @@
 <div class="actions">
 	<h3><?php echo __('Actions'); ?></h3>
 	<ul>
+		<li><?php echo $this->Html->link(__('Upload Species File'), array('action' => 'single_upload_json')); ?></li>
 		<li><?php echo $this->Html->link(__('New Species'), array('action' => 'add')); ?></li>
 		<li><?php echo $this->Html->link(__('List Occurrences'), array('controller' => 'occurrences', 'action' => 'index')); ?> </li>
 		<li><?php echo $this->Html->link(__('New Occurrence'), array('controller' => 'occurrences', 'action' => 'add')); ?> </li>
