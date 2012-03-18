@@ -215,18 +215,14 @@ class SpeciesController extends AppController {
 			$tmp_file_path= $file['tmp_name'];
 
 			// Expected file type is application/json
-			if ($file_type != 'application/json') {
-				$this->Session->setFlash(__('The species file must be of type application/json. You supplied: '.$file_type.'. Upload file could not be processed. Please, try again.'));
-			} else {
-				$file_contents = file_get_contents($tmp_file_path);
-				$json_decoded_file_contents = json_decode($file_contents, true);
+			$file_contents = file_get_contents($tmp_file_path);
+			$json_decoded_file_contents = json_decode($file_contents, true);
 
-				if ($this->Species->saveAssociated($json_decoded_file_contents)) {
-					$this->Session->setFlash(__('The species has been saved'));
-					$this->redirect(array('action' => 'index'));
-				} else {
-					$this->Session->setFlash(__('The species could not be saved. Please, try again.'));
-				}
+			if ($this->Species->saveAssociated($json_decoded_file_contents)) {
+				$this->Session->setFlash(__('The species has been saved'));
+				$this->redirect(array('action' => 'index'));
+			} else {
+				$this->Session->setFlash(__('The species could not be saved. Please, try again.'));
 			}
 		}
 		// Else -> Fall through to render view (form to upload a single species json file)

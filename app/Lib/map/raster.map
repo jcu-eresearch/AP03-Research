@@ -33,7 +33,7 @@ MAP
 
         #define the transparent of image. 100 is not transpartent.
         #0 is totally transparent.
-        TRANSPARENCY 40
+        TRANSPARENCY 60
 
         #define the color table. color are define as RGB color from 0 to 255.
         #EXPRESSION are used to define the style apply to the right rang of data

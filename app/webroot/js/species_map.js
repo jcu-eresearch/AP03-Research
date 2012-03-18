@@ -29,7 +29,7 @@ $(document).ready(function() {
 			map_tool_url,
 			// Params to send as part of request (note: keys will be auto-upcased)
 			{MODE: 'map', MAP: 'raster.map', DATA: (species_id + '_1975.asc'), SPECIESID: species_id, REASPECT: "false", TRANSPARENT: 'true'},
-			{isBaseLayer: false, opacity: 0.9, projection: geographic}
+			{isBaseLayer: false, opacity: 1, projection: geographic}
 		);
 
 		// Google Maps Layers
@@ -73,6 +73,7 @@ $(document).ready(function() {
 				pointRadius: "${point_radius}",
 				fillColor: "#ee9900",
 				fillOpacity: 0.4,
+				strokeOpacity: 0.4
 		});
 
 		var mformat = new OpenLayers.Format.GeoJSON({
@@ -100,7 +101,8 @@ $(document).ready(function() {
 				"default": style,
 				"select": {
 					"fillColor": "#83aeef",
-					"fillOpacity": 0.8,
+					"fillOpacity": 0.7,
+					"strokeOpacity": 0.7
 				},
 			})
 		});

@@ -5,3 +5,6 @@ tags
 /plugins
 /vendors
 /app/DB/*
+/app/.htaccess
+/app/webroot/.htaccess
+/.htaccess
